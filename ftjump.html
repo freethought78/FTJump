@@ -1,0 +1,292 @@
+<script src='ftsvg.js'></script>
+
+<body onresize="resizeStage()">
+<svg id='stage'></svg>
+<div id='score'></div>
+<div id='instructions'>z: jump 1<br>x: jump 2</div>
+</body>
+
+<style>
+body{
+	margin:0;
+	background-color: black;
+}
+
+#score{
+	position:absolute;
+	top: 0px;
+	left: 0px;
+	color: white;
+}
+
+#instructions{
+	position:absolute;
+	top: 0px;
+	right: 0px;
+	color: white;
+}
+</style>
+
+<script>
+//-------------------------------- KEYBINDS ---------------------------- 
+var jumpone = 'z'
+var jumptwo = 'x'
+//---------------------------------------------------------------------- 
+
+var score = 0
+var angle = Math.random()*360
+var zoom = 200
+var x = 0, y = 0
+var colorspeed = 10
+var gamelength = 1000
+
+var risepoint = 0
+
+var stage = document.querySelector('#stage')
+var scorediv = document.querySelector('#score')
+
+resizeStage();	
+
+var track = []
+initializeTrack()
+drawTrack()
+updateScreen()
+colorCycle()
+sizeCycle()
+
+function colorCycle(){
+	var colorinterval = setInterval(()=>{
+		track.forEach((space)=>{
+			space.hue += colorspeed
+			if(space.hue > 360) space.hue -= 360
+			if(space.filled) space.circle.setAttribute('fill', `hsl(${space.hue}, 100%, 50%)`)
+			if(space.line != null) space.line.setAttribute('stroke', `hsl(${space.hue}, 100%, 50%)`)
+		})
+	},100)
+}
+
+function sizeCycle(){
+	var rate = 0.3
+	setInterval(()=>{
+		track.forEach((space)=>{
+			if(space.filled){
+				if (space.grow == true){
+					if(space.size < 10){
+						space.size += rate
+					} else {
+						space.grow = false
+					}
+				}
+				
+				if (space.grow == false){
+					if(space.size > 5){
+						space.size -= rate
+					} else {
+						space.grow = true
+					}
+				}
+				
+				space.circle.setAttribute('r', space.size)
+			}
+		})
+	},100)
+}
+
+function initializeTrack(){
+	var threshold = 0
+	var lastx = 0, lasty = 0, lastfilled = false
+	for(var space = 0; space < gamelength; space++){
+		var newpoint = pointAtAngle(lastx, lasty, angle, 20)
+		var percentile = Math.random()*100
+		var filled = false
+		var hue = space * 3
+		while (hue > 360) hue -= 360
+		if (percentile > threshold || !lastfilled) filled = true
+		track.push({
+			x:newpoint.x,
+			y:newpoint.y,
+			filled,
+			hue,
+			fall: function(){
+				if (this.filled){
+					var o = 1
+					var interval = setInterval(()=>{
+						if(o > 0) {
+							o -= 0.1 
+							this.circle.setAttribute('opacity', o)
+							if(this.line != null) this.line.setAttribute('opacity', o)
+						} else {
+							clearInterval(interval)
+						}
+					}, 100)
+				}
+			},
+			rise: function(){
+				if (this.filled){
+					var o = 0
+					var interval = setInterval(()=>{
+						if(o < 1) {
+							o += 0.1
+							this.circle.setAttribute('opacity', o)
+							if(this.line != null) this.line.setAttribute('opacity', o)
+						} else {
+							clearInterval(interval)
+						}
+					}, 100)
+				}
+			}
+		})
+		lastx = newpoint.x
+		lasty = newpoint.y
+		lastfilled = filled
+		updateAngle()
+		
+		threshold += 1
+		if(threshold > 50) threshold = Math.random()*100
+	}
+}
+
+var anglechange = 0
+function updateAngle(){
+	anglechange = Math.random()*80 -40
+	angle += anglechange
+}
+
+function pointAtAngle(inx, iny, angle, distance){
+	var radians = angle * Math.PI / 180
+	var outx = distance * Math.sin(radians)
+	var outy = distance * Math.cos(radians)
+	outx+= inx
+	outy+= iny
+	return ({x:outx, y:outy})
+}
+
+function resizeStage(){
+	stage.style.height = window.innerHeight
+	stage.style.width = window.innerWidth
+	moveView(x,y)
+}
+
+
+
+function drawTrack(){
+	for(var s in track){
+		var space = track[s]
+		if (space.filled) {
+			space.circle = drawCircle(stage, space.x, space.y, 8)
+			space.circle.setAttribute('opacity', 0)
+			space.circle.setAttribute('fill', `hsl(${space.hue}, 100%, 50%)`)
+			var size = Math.random()*5 +5
+			space.circle.setAttribute('r', size)
+			var grow = Math.random()*2
+			if(grow>1) {grow = true} else {grow = false}
+			track[s].grow = grow
+			track[s].size = size
+		}
+		if (s>0 && track[s-1].filled && space.filled){
+			space.line = drawLine(stage, track[s-1].x, track[s-1].y, space.x, space.y)
+			space.line.setAttribute('stroke', `hsl(${space.hue}, 100%, 50%)`)
+			space.line.setAttribute('opacity', 0)
+		}
+	}
+}
+
+function moveView(x,y){
+	var left, top, width, height
+	
+	left = x-zoom
+	width = zoom * 2
+	top = y-zoom
+	height = zoom * 2
+
+	stage.setAttribute("viewBox", `${left} ${top} ${width} ${height}`)
+}
+
+window.onkeydown =(e)=>{
+	if(e.key == jumpone) forwardOne()
+	if(e.key == jumptwo) forwardTwo()
+}
+
+function forwardOne(){
+	if(gameovermessage == false){
+		score++
+		updateScreen()
+		if(!track[score].filled)endGame()
+		startTimer()
+	}
+}
+
+function forwardTwo(){
+	if(gameovermessage == false){
+		score+=2
+		updateScreen()
+		if(!track[score].filled)endGame()
+		startTimer()
+	}
+}
+
+var timerstarted = false
+function startTimer(){
+	if(timerstarted == false){
+		track[0].fall()
+		var falltimer = setInterval(updateFall, 500)
+	}
+	timerstarted = true
+}
+
+fallpoint = 0
+function updateFall(){
+	fallpoint++
+	track[fallpoint].fall()
+	while(score - fallpoint > 3){
+		fallpoint++
+		track[fallpoint].fall()
+	}
+	if (score < fallpoint) endGame()
+}
+
+
+function updateRise(){
+	while(risepoint < score + 30){
+		if (risepoint < gamelength){
+			track[risepoint].rise()
+		}
+		risepoint++
+	}
+}
+
+gameovermessage = false
+function endGame(){
+	window.onkeydown = null
+	if(gameovermessage == false){	
+		gameovermessage = true
+		setTimeout(()=>{
+			alert (`Your score was ${score}.`)
+			location.reload()
+		}, 1000)
+	}
+}
+
+function updateScreen(){
+
+	moveView(track[score].x, track[score].y)
+	if (track[score].filled){
+		track[score].circle.setAttribute('stroke-width', 3)
+		track[score].circle.setAttribute('stroke', 'white')
+	}
+	if (score > 0){
+		if (track[score-1].filled) track[score-1].circle.setAttribute('stroke-width', 0)
+	}
+	
+	if (score > 1){
+		if (track[score-2].filled) track[score-2].circle.setAttribute('stroke-width', 0)
+	}
+	updateRise();
+	scorediv.innerHTML = `Score: ${score}`
+	
+	if (score == track.length - 1){
+		setTimeout(()=>{alert('You Win!')}, 100)
+		endGame();
+	}
+}
+</script>
