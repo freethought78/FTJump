@@ -95,12 +95,13 @@ function sizeCycle(){
 function initializeTrack(){
 	var threshold = 0
 	var lastx = 0, lasty = 0, lastfilled = false
-	for(var space = 0; space < gamelength; space++){
+	for(var space = 0; space <= gamelength; space++){
 		var newpoint = pointAtAngle(lastx, lasty, angle, 20)
 		var percentile = Math.random()*100
 		var filled = false
 		var hue = space * 3
 		while (hue > 360) hue -= 360
+		if(space == gamelength) threshold = -1
 		if (percentile > threshold || !lastfilled) filled = true
 		track.push({
 			x:newpoint.x,
@@ -248,7 +249,7 @@ function updateFall(){
 
 function updateRise(){
 	while(risepoint < score + 30){
-		if (risepoint < gamelength){
+		if (risepoint <= gamelength){
 			track[risepoint].rise()
 		}
 		risepoint++
