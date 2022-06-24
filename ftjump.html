@@ -39,20 +39,62 @@ var zoom = 200
 var x = 0, y = 0
 var colorspeed = 10
 var gamelength = 1000
-
+var track = []
+var body, hold
+	
 var risepoint = 0
 
 var stage = document.querySelector('#stage')
 var scorediv = document.querySelector('#score')
 
-resizeStage();	
+requestStartGame()
 
-var track = []
-initializeTrack()
-drawTrack()
-updateScreen()
-colorCycle()
-sizeCycle()
+function startGame(){
+	resizeStage();	
+
+	initializeTrack()
+	drawTrack()
+	updateScreen()
+	colorCycle()
+	sizeCycle()
+}
+
+function requestStartGame(){
+	body = document.querySelector('body')
+	hold = body.innerHTML
+	body.innerHTML = "<button id='sg' onclick='authStartGame()'>Start Game</button>"
+	var sg = document.querySelector('#sg')
+	sg.style.position = 'absolute'
+	sg.style.left = window.innerWidth /2 - sg.offsetWidth/2
+	sg.style.top = window.innerHeight /2 - sg.offsetHeight/2
+}
+
+function authStartGame(){
+	toggleFullScreen()
+	body.innerHTML = hold
+	stage = document.querySelector('#stage')
+	scorediv = document.querySelector('#score')
+	startGame()
+}
+
+function toggleFullScreen() {
+	var el = document.documentElement
+	, rfs = // for newer Webkit and Firefox
+		   el.requestFullScreen
+		|| el.webkitRequestFullScreen
+		|| el.mozRequestFullScreen
+		|| el.msRequestFullScreen
+	;
+	if(typeof rfs!="undefined" && rfs){
+	  rfs.call(el);
+	} else if(typeof window.ActiveXObject!="undefined"){
+	  // for Internet Explorer
+	  var wscript = new ActiveXObject("WScript.Shell");
+	  if (wscript!=null) {
+		 wscript.SendKeys("{F11}");
+	  }
+	}
+}
 
 function colorCycle(){
 	var colorinterval = setInterval(()=>{
