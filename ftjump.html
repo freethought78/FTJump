@@ -63,10 +63,14 @@ function requestStartGame(){
 	body = document.querySelector('body')
 	hold = body.innerHTML
 	body.innerHTML = "<button id='sg' onclick='authStartGame()'>Start Game</button>"
+	body.style.backgroundColor = 'black'
 	var sg = document.querySelector('#sg')
 	sg.style.position = 'absolute'
+	sg.style.height = 100
+	sg.style.width = 100
 	sg.style.left = window.innerWidth /2 - sg.offsetWidth/2
 	sg.style.top = window.innerHeight /2 - sg.offsetHeight/2
+	
 }
 
 function authStartGame(){
