@@ -92,10 +92,12 @@ function authStartGame(){
 	}
 
 	document.querySelector('#stage').ontouchstart =(e)=>{
-		if (e.clientX < window.innerWidth/2) 
-			forwardOne()
-		else
-			forwardTwo()
+		for(var touch in e.touches){
+			if (touch.pageX < window.innerWidth/2) 
+				forwardOne()
+			else
+				forwardTwo()
+		}
 	}
 	
 	startGame()
