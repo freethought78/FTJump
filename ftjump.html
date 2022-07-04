@@ -91,7 +91,7 @@ function authStartGame(){
 		if(e.key == jumptwo) forwardTwo()
 	}
 
-	document.querySelector('#stage').onmousedown =(e)=>{
+	document.querySelector('#stage').ontouchstart =(e)=>{
 		if (e.clientX < window.innerWidth/2) 
 			forwardOne()
 		else
