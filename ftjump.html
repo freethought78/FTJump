@@ -3,7 +3,7 @@
 <body onresize="resizeStage()">
 <svg id='stage'></svg>
 <div id='score'></div>
-<div id='instructions'>z: jump 1<br>x: jump 2</div>
+<div id='instructions'>tap left: jump 1<br>tap right: jump 2</div>
 </body>
 
 <style>
@@ -47,9 +47,10 @@ var risepoint = 0
 var stage = document.querySelector('#stage')
 var scorediv = document.querySelector('#score')
 
+/*
 if(mobileCheck()){
 	document.querySelector('#instructions').innerHTML = 'tap left: jump 1<br>tap right: jump 2'
-}
+}*/
 
 //requestStartGame()
 authStartGame()
