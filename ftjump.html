@@ -35,7 +35,7 @@ var jumptwo = 'x'
 
 var score = 0
 var angle = Math.random()*360
-var zoom = 200
+var zoom = 100
 var x = 0, y = 0
 var colorspeed = 10
 var gamelength = 1000
@@ -51,7 +51,8 @@ if(mobileCheck()){
 	document.querySelector('#instructions').innerHTML = 'tap left: jump 1<br>tap right: jump 2'
 }
 
-requestStartGame()
+//requestStartGame()
+authStartGame()
 
 function startGame(){
 	resizeStage();	
@@ -80,10 +81,10 @@ function requestStartGame(){
 }
 
 function authStartGame(){
-	toggleFullScreen()
-	body.innerHTML = hold
-	stage = document.querySelector('#stage')
-	scorediv = document.querySelector('#score')	
+	//toggleFullScreen()
+	//body.innerHTML = hold
+	//stage = document.querySelector('#stage')
+	//scorediv = document.querySelector('#score')	
 	
 	window.onkeydown =(e)=>{
 		if(e.key == jumpone) forwardOne()
