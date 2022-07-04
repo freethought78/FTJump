@@ -59,8 +59,8 @@ function startGame(){
 	initializeTrack()
 	drawTrack()
 	updateScreen()
-	//colorCycle()
-	//sizeCycle()
+	colorCycle()
+	sizeCycle()
 }
 
 function requestStartGame(){
@@ -90,7 +90,7 @@ function authStartGame(){
 		if(e.key == jumptwo) forwardTwo()
 	}
 
-	document.querySelector('#stage').onclick =(e)=>{
+	document.querySelector('#stage').onmousedown =(e)=>{
 		if (e.clientX < window.innerWidth/2) 
 			forwardOne()
 		else
